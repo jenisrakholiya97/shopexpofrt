@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vniexport.com/sitemap.xml
+Host: https://vniexport.com
