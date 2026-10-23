@@ -220,15 +220,33 @@ describe('VNI Export & Import Landing Page Suite', () => {
 
       expect(screen.getByText(/Please enter your name\./i)).toBeInTheDocument()
       expect(screen.getByText(/Please enter your company name and country\./i)).toBeInTheDocument()
-      expect(screen.getByText(/Please enter your email or WhatsApp number\./i)).toBeInTheDocument()
+      expect(screen.getByText(/Please enter your email\./i)).toBeInTheDocument()
       expect(screen.getByText(/Please specify the product and required quantity\./i)).toBeInTheDocument()
+    })
+
+    it('shows validation error when an invalid email is entered', () => {
+      render(<HomePage />)
+      const nameInput = screen.getByLabelText(/^Name/i)
+      const companyInput = screen.getByLabelText(/Company and country/i)
+      const contactInput = screen.getByLabelText(/^Email/i, { selector: 'input' })
+      const productInput = screen.getByLabelText(/Product and quantity/i)
+
+      fireEvent.change(nameInput, { target: { value: 'Fatima Zahra' } })
+      fireEvent.change(companyInput, { target: { value: 'Middle East Foods LLC' } })
+      fireEvent.change(contactInput, { target: { value: 'invalid-email-format' } })
+      fireEvent.change(productInput, { target: { value: 'Basmati Rice 1121' } })
+
+      const submitBtn = screen.getByRole('button', { name: /Send Export Enquiry/i })
+      fireEvent.click(submitBtn)
+
+      expect(screen.getByText(/Please enter a valid email address\./i)).toBeInTheDocument()
     })
 
     it('submits valid form and displays confirmation voucher with reference ID', async () => {
       render(<HomePage />)
       const nameInput = screen.getByLabelText(/^Name/i)
       const companyInput = screen.getByLabelText(/Company and country/i)
-      const contactInput = screen.getByLabelText(/Email or WhatsApp/i)
+      const contactInput = screen.getByLabelText(/^Email/i, { selector: 'input' })
       const productInput = screen.getByLabelText(/Product and quantity/i)
 
       fireEvent.change(nameInput, { target: { value: 'Fatima Zahra' } })
@@ -249,6 +267,7 @@ describe('VNI Export & Import Landing Page Suite', () => {
       expect(screen.getByText(/Enquiry Received Successfully!/i)).toBeInTheDocument()
       expect(screen.getByText(/Fatima Zahra/i)).toBeInTheDocument()
       expect(screen.getByText(/VNI-REQ-/i)).toBeInTheDocument()
+      expect(screen.getAllByText(/mayur\.isamaliya@vniexport\.com/i).length).toBeGreaterThan(0)
     })
   })
 
@@ -319,14 +338,14 @@ describe('VNI Export & Import Landing Page Suite', () => {
       render(<HomePage />)
       const nameInput = screen.getByLabelText(/^Name/i)
       const companyInput = screen.getByLabelText(/Company and country/i)
-      const contactInput = screen.getByLabelText(/Email or WhatsApp/i)
+      const contactInput = screen.getByLabelText(/^Email/i, { selector: 'input' })
       const productInput = screen.getByLabelText(/Product and quantity/i)
       const incotermSelect = screen.getByLabelText(/Preferred Incoterm \(Delivery Terms\)/i)
       const portInput = screen.getByLabelText(/Destination Seaport/i)
 
       fireEvent.change(nameInput, { target: { value: 'Ahmed Al Mansoori' } })
       fireEvent.change(companyInput, { target: { value: 'Gulf Agro Trading LLC, Oman' } })
-      fireEvent.change(contactInput, { target: { value: '+968 9123 4567' } })
+      fireEvent.change(contactInput, { target: { value: 'ahmed@gulfagro.om' } })
       fireEvent.change(productInput, { target: { value: 'Soyabean Non-GMO, 2 x 20ft FCL' } })
       fireEvent.change(incotermSelect, { target: { value: 'CIP' } })
       fireEvent.change(portInput, { target: { value: 'Sohar Port' } })

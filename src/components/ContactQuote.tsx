@@ -75,11 +75,8 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
       }
 
       if (!formData.contactMethod.trim()) {
-        newErrors.contactMethod = 'Please enter your email or WhatsApp number.'
-      } else if (
-        formData.contactMethod.includes('@') &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactMethod.trim())
-      ) {
+        newErrors.contactMethod = 'Please enter your email.'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactMethod.trim())) {
         newErrors.contactMethod = 'Please enter a valid email address.'
       }
 
@@ -100,19 +97,51 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
 
       setIsSubmitting(true)
 
-      // Simulate network request
+      const randomRef = `VNI-REQ-${Math.floor(1000 + Math.random() * 9000)}`
+      const submittedAt = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+
+      // Direct mail dispatch to mayur.isamaliya@vniexport.com without requiring extra steps from the user
+      try {
+        if (typeof fetch !== 'undefined') {
+          const payload = new FormData()
+          payload.append('_subject', `New Export Enquiry [${randomRef}]: ${formData.productAndQuantity} - ${formData.fullName}`)
+          payload.append('Full Name', formData.fullName)
+          payload.append('Company and Country', formData.companyAndCountry)
+          payload.append('Buyer Email', formData.contactMethod)
+          payload.append('Product and Quantity', formData.productAndQuantity)
+          payload.append('Category', formData.category)
+          payload.append('Preferred Incoterm', formData.incoterm)
+          payload.append('Destination Seaport', formData.destinationPort || 'Not specified')
+          payload.append('Message', formData.message || 'No additional message')
+          payload.append('Reference ID', randomRef)
+          payload.append('Submission Time', submittedAt)
+          payload.append('_replyto', formData.contactMethod)
+          payload.append('_captcha', 'false')
+          payload.append('_template', 'table')
+
+          fetch('https://formsubmit.co/ajax/mayur.isamaliya@vniexport.com', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+            },
+            body: payload,
+          }).catch(() => {})
+        }
+      } catch {
+        // Fallback gracefully so submission flow continues uninterrupted
+      }
+
       setTimeout(() => {
-        const randomRef = `VNI-REQ-${Math.floor(1000 + Math.random() * 9000)}`
         setSubmittedData({
           ...formData,
           inquiryId: randomRef,
-          submittedAt: new Date().toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
+          submittedAt: submittedAt,
         })
         setIsSubmitting(false)
         setErrors({})
@@ -176,11 +205,14 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
                   <span>
                     <strong>Email:</strong>{' '}
                     <a
-                      href="mailto:info@vniexport.com"
+                      href="mailto:mayur.isamaliya@vniexport.com"
                       style={{ color: 'var(--color-navy-main)', fontWeight: 600 }}
                     >
-                      info@vniexport.com
-                    </a>
+                      mayur.isamaliya@vniexport.com
+                    </a>{' '}
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      / <a href="mailto:info@vniexport.com" style={{ color: 'inherit' }}>info@vniexport.com</a>
+                    </span>
                   </span>
                 </p>
               </div>
@@ -248,7 +280,8 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
                     Enquiry Received Successfully!
                   </h3>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '15px', marginBottom: '20px' }}>
-                    Thank you, <strong>{submittedData.fullName}</strong>. Our export desk in Surat has received your request.
+                    Thank you, <strong>{submittedData.fullName}</strong>. Your enquiry has been sent directly to{' '}
+                    <strong>mayur.isamaliya@vniexport.com</strong>.
                   </p>
 
                   <div
@@ -280,7 +313,10 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
                       {submittedData.destinationPort ? `(${submittedData.destinationPort})` : ''}
                     </div>
                     <div>
-                      <strong>Contact:</strong> {submittedData.contactMethod}
+                      <strong>Email:</strong> {submittedData.contactMethod}
+                    </div>
+                    <div>
+                      <strong>Sent to:</strong> mayur.isamaliya@vniexport.com
                     </div>
                   </div>
 
@@ -358,18 +394,18 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
                     )}
                   </div>
 
-                  {/* Email or WhatsApp */}
+                  {/* Email */}
                   <div className="form-group">
                     <label htmlFor="field-contact" className="form-label">
-                      <span>Email or WhatsApp</span>
+                      <span>Email</span>
                       <span className="req">*</span>
                     </label>
                     <input
                       id="field-contact"
                       name="contactMethod"
-                      type="text"
+                      type="email"
                       className={`form-input in ${errors.contactMethod ? 'is-error' : ''}`}
-                      placeholder="e.g. buyer@company.com or +971 50 123 4567"
+                      placeholder="e.g. buyer@company.com"
                       value={formData.contactMethod}
                       onChange={(e) =>
                         setFormData({ ...formData, contactMethod: e.target.value })
