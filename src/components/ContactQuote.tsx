@@ -205,14 +205,11 @@ export const ContactQuote = forwardRef<ContactQuoteHandle, ContactQuoteProps>(
                   <span>
                     <strong>Email:</strong>{' '}
                     <a
-                      href="mailto:mayur.isamaliya@vniexport.com"
+                      href="mailto:info@vniexport.com"
                       style={{ color: 'var(--color-navy-main)', fontWeight: 600 }}
                     >
-                      mayur.isamaliya@vniexport.com
-                    </a>{' '}
-                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                      / <a href="mailto:info@vniexport.com" style={{ color: 'inherit' }}>info@vniexport.com</a>
-                    </span>
+                      info@vniexport.com
+                    </a>
                   </span>
                 </p>
               </div>
