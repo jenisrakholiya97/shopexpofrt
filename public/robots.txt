@@ -1,5 +1,12 @@
 User-agent: *
 Allow: /
 
+User-agent: Googlebot-Image
+Allow: /
+Allow: /favicon*
+Allow: /*.png
+Allow: /*.ico
+Allow: /*.svg
+
 Sitemap: https://vniexport.com/sitemap.xml
 Host: https://vniexport.com
